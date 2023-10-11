@@ -126,3 +126,24 @@ data2 <- fill_data %>%
 kbl(data2) %>% 
         kable_styling()
 ```
+
+fifth question
+===============
+
+```{r}
+fill_data$weekday <- weekdays(fill_data$date)
+
+fill_data$weekday1 <- ifelse(fill_data$weekday == "Saturday" | fill_data$weekday == "Sunday", "Weekend", "Weekday")
+
+fill_data1 <- fill_data %>%
+        select(steps_adj, interval, weekday1) %>% 
+        group_by(interval, weekday1) %>% 
+        summarise(mean(steps_adj))
+        
+ggplot(fill_data1) +
+  aes(x = interval, y = `mean(steps_adj)`) +
+  geom_step(colour = "#112446") +
+  theme_minimal() +
+  facet_wrap(vars(weekday1))
+
+```
