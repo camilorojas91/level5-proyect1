@@ -1,0 +1,128 @@
+---
+title: "Proyecto 1"
+author: "Camilo Rojas"
+date: "2023-10-11"
+output: html_document
+---
+
+
+```{r, echo=TRUE}
+library(knitr)
+opts_chunk$set(echo = TRUE)
+
+```
+
+First question
+==============
+
+I load the dataset and named it as ***data***
+
+```{r}
+library(rio)
+
+data <- import("./activity.csv")
+
+data$steps <- as.numeric(data$steps)
+data$date <- as.Date(data$date)
+```
+
+second question
+=================
+
+
+```{r}
+total_steps <- sum(data$steps, na.rm = T)
+```
+
+1. the number total of steps in this dataset is `r total_steps`
+
+2. i did the histogram per day vs number of steps
+```{r, fig.width=8, fig.height=4}
+library(dplyr)
+library(ggplot2)
+
+data %>%
+ filter(!is.na(steps)) %>%
+ ggplot() +
+  aes(x = date, weight = steps) +
+  geom_bar(fill = "#112446") +
+  labs(
+    x = "Day",
+    y = "number of steps",
+    title = "steps per day"
+  ) +
+  theme_classic()
+
+```
+3. the next table show report the mean and median of the total number of steps taken per day
+
+```{r, results= 'asis'}
+library(kableExtra)
+data1 <- data %>% 
+        select(date, steps) %>% 
+        group_by(date) %>% 
+        summarise(median = median(steps,na.rm = T), mean = mean(steps,na.rm = T))
+data1$mean <- ifelse(is.nan(data1$mean),0,data1$mean)
+data1$median <- ifelse(is.nan(data1$median),0,data1$median)
+kbl(data1) %>% 
+        kable_styling()
+
+```
+third question
+=================
+
+time series plot for 5-minute interval
+
+```{r}
+interval5 <- data %>% 
+        filter(interval == 5)
+
+interval5 %>%
+ filter(!is.na(steps)) %>%
+ ggplot() +
+  aes(x = date, weight = steps) +
+  geom_bar(fill = "#112446") +
+  theme_minimal()
+```
+
+the day that has the maximun number of steps is 2012-10-10
+
+fourd question
+=================
+
+```{r}
+
+steps_na <- sum(is.na(data$steps))
+date_na <- sum(is.na(data$date))
+interval_na <- sum(is.na(data$interval))
+```
+
+1. In this dataset i could found that we has `r steps_na` NA values at the steps column, `r date_na` NA values at the date column and `r interval_na` NA values at the interval column 
+
+2. fill de Na values in the dataset
+
+```{r}
+
+fill_data <- merge(data, data1, by = "date")
+
+fill_data$steps_adj <- ifelse(is.na(fill_data$steps), fill_data$mean, fill_data$steps)
+        
+
+fill_data %>%
+ ggplot() +
+  aes(x = date, weight = steps) +
+  geom_bar(fill = "#112446") +
+  theme_minimal()
+```
+
+when all the values filled we can see that the values for the mean and median per day looks like 
+
+```{r}
+data2 <- fill_data %>% 
+        select(date, steps) %>% 
+        group_by(date) %>% 
+        summarise(median = median(steps), mean = mean(steps))
+
+kbl(data2) %>% 
+        kable_styling()
+```
