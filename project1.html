@@ -581,7 +581,8 @@ display: none;
 </div>
 
 
-<pre class="r"><code>library(knitr)
+<pre class="r"><code>library(latexpdf)
+library(knitr)
 opts_chunk$set(echo = TRUE)</code></pre>
 <div id="first-question" class="section level1">
 <h1>First question</h1>
@@ -631,7 +632,8 @@ steps taken per day</p>
 <pre><code>## The following object is masked from &#39;package:dplyr&#39;:
 ## 
 ##     group_rows</code></pre>
-<pre class="r"><code>data1 &lt;- data %&gt;% 
+<pre class="r"><code>library(dplyr)
+data1 &lt;- data %&gt;% 
         select(date, steps) %&gt;% 
         group_by(date) %&gt;% 
         summarise(median = median(steps,na.rm = T), mean = mean(steps,na.rm = T))
